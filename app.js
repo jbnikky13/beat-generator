@@ -122,15 +122,10 @@ function tick(){
 }
 async function exportTrack(){
  stop();expB.disabled=true;expB.textContent='Rendering…';
- try{
-  const sr=44100,oc=new OfflineAudioContext(2,Math.ceil((TOTAL*16*60/song.bpm/4+3)*sr),sr);
-  schedule(oc,master(oc),song,.05);
-  const buf=await oc.startRendering(),nm=song.title.replace(/\W+/g,'-')||'beat';
-  const blob=new Blob([wavBytes(buf)],{type:'audio/wav'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=nm+'.wav';
-  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
-  expB.textContent='Saved';
- }catch(e){console.error(e);expB.textContent='Export failed'}
+ try{const sr=44100,oc=new OfflineAudioContext(2,Math.ceil((TOTAL*16*60/song.bpm/4+3)*sr),sr);
+  schedule(oc,master(oc),song,.05);const buf=await oc.startRendering(),nm=song.title.replace(/\W+/g,'-');
+  await dl.save({filename:nm+'.zip',data:zipOne(nm+'.wav',wavBytes(buf))});expB.textContent='Saved'}
+ catch(e){expB.textContent=e&&e.code=='declined'?'Export':'Export failed'}
  expB.disabled=false;setTimeout(()=>expB.textContent='Export',2500)
 }
 $('#genres').innerHTML=Object.keys(G).map(k=>`<button data-g="${k}">${G[k].n}</button>`).join('');
