@@ -7,11 +7,20 @@ function setStatus(t,ready=false){$('#status').textContent=t;$('#status').classN
 function setProgress(n){$('#progressBar').style.width=n+'%'}
 function promptFor(lyrics){return `Create an original complete song using the EXACT USER-PROVIDED LYRICS below. Perform the lyrics as sung vocals. Genre/style: ${GENRES[genre]}. Tempo: ${$('#bpm').value} BPM. Structure: [Intro] [Verse] [Pre Chorus] [Chorus] [Verse 2] [Bridge] [Final Chorus] [Outro]. Polished professional mix. USER LYRICS:\n${lyrics}`}
 async function generate(){
- const lyrics=$('#lyrics').value.trim();if(!lyrics){$('#lyrics').focus();$('#songTitle').textContent='Add your lyrics first.';return}
- if(lyrics.length>3500){alert('MiniMax Music 2.6 accepts up to 3,500 lyric characters. Please shorten your lyrics.');return}
+ const lyrics=$('#lyrics').value.trim();
+ if(!lyrics){$('#lyrics').focus();$('#songTitle').textContent='Add your lyrics first.';return}
+ if(lyrics.length>8000){alert('Please keep lyrics under 8,000 characters for reliable generation.');return}
  if(audio){audio.pause();audio=null}
- $('#generate').disabled=true;$('#play').disabled=true;$('#download').disabled=true;$('#generate').textContent='Generating…';setStatus('GENERATING');setProgress(8);
- try{const res=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lyrics,genre,tempo:Number($('#bpm').value),prompt:promptFor(lyrics)})});const data=await res.json();if(!res.ok)throw new Error(data.error||'Generation failed');audioUrl=data.audioUrl;$('#songTitle').textContent=data.title||'AI Generated Song';$('#songMeta').textContent=`${GENRES[genre].split(' — ')[0]} · ${$('#bpm').value} BPM · MiniMax Music 2.6`;$('#lyricsPreview').textContent=lyrics;$('#arrangement').innerHTML=['INTRO','VERSE 1','PRE','CHORUS','VERSE 2','BRIDGE','FINAL','OUTRO'].map(x=>'<div><span>'+x+'</span></div>').join('');audio=new Audio(audioUrl);audio.preload='auto';audio.onended=()=>{$('#play').textContent='Play';setStatus('READY',true)};$('#play').disabled=false;$('#download').disabled=false;generated=true;setProgress(100);setStatus('READY',true);$('#audioName').textContent='Use generated song: '+($('#songTitle').textContent||'song')}catch(e){console.error(e);setStatus('ERROR');$('#songTitle').textContent='Generation failed';$('#songMeta').textContent=e.message||'Check your provider configuration.';setProgress(0)}finally{$('#generate').disabled=false;$('#generate').textContent='Generate AI Song'}
+ $('#generate').disabled=true;$('#play').disabled=true;$('#download').disabled=true;$('#generate').textContent='Generating with Suno…';setStatus('GENERATING');setProgress(8);
+ try{
+  const res=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lyrics,genre,tempo:Number($('#bpm').value),title:'Song Studio — '+genre})});
+  const data=await res.json();if(!res.ok)throw new Error(data.error||'Suno generation failed.');
+  audioUrl=data.audioUrl;$('#songTitle').textContent=data.title||'Suno Song';$('#songMeta').textContent=GENRES[genre].split(' — ')[0]+' · '+$('#bpm').value+' BPM · Suno';$('#lyricsPreview').textContent=lyrics;
+  $('#arrangement').innerHTML=['INTRO','VERSE 1','PRE','CHORUS','VERSE 2','BRIDGE','FINAL','OUTRO'].map(x=>'<div><span>'+x+'</span></div>').join('');
+  audio=new Audio(audioUrl);audio.preload='auto';audio.onended=()=>{$('#play').textContent='Play';setStatus('READY',true)};
+  $('#play').disabled=false;$('#download').disabled=false;generated=true;setProgress(100);setStatus('READY',true);$('#audioName').textContent='Use generated song: '+($('#songTitle').textContent||'song')
+ }catch(e){console.error(e);setStatus('ERROR');$('#songTitle').textContent='Generation failed';$('#songMeta').textContent=e.message||'Check the Suno API configuration.';setProgress(0)}
+ finally{$('#generate').disabled=false;$('#generate').textContent='Generate AI Song'}
 }
 async function generateVideo(){
  const prompt=$('#videoPrompt').value.trim()||`Cinematic ${GENRES[genre].split(' — ')[0]} music video, stylish Nigerian/African visual storytelling, dynamic camera movement, rich lighting, artist performance energy`;
