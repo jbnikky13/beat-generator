@@ -1,1 +1,1 @@
-{"cleanUrls":true,"trailingSlash":false,"outputDirectory":"."}
+{"cleanUrls":true,"trailingSlash":false,"outputDirectory":".","functions":{"api/generate.js":{"maxDuration":300}}}
