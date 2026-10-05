@@ -42,18 +42,3 @@ $('#generate').onclick=generate;$('#generateVideo').onclick=generateVideo;$('#co
 $('#play').onclick=()=>{if(!audio)return;if(audio.paused){audio.play();$('#play').textContent='Pause';setStatus('PLAYING')}else{audio.pause();$('#play').textContent='Play';setStatus('PAUSED')}};
 $('#download').onclick=()=>{if(!audioUrl)return;const a=document.createElement('a');a.href=audioUrl;a.download=(($('#songTitle').textContent||'generated-song').replace(/[^a-z0-9]+/gi,'-').replace(/^-|-$/g,'')||'generated-song')+'.mp3';a.target='_blank';a.click()};
 mark();$('#bpmValue').textContent=$('#bpm').value+' BPM';
-const visualizer=document.getElementById('visualizer'),vctx=visualizer?.getContext('2d');
-const heroCanvas=document.getElementById('heroCanvas'),hctx=heroCanvas?.getContext('2d');
-function resizeCanvas(){if(!visualizer||!heroCanvas)return;const d=devicePixelRatio||1;visualizer.width=innerWidth*d;visualizer.height=innerHeight*d;heroCanvas.width=heroCanvas.clientWidth*d;heroCanvas.height=heroCanvas.clientHeight*d;vctx.setTransform(d,0,0,d,0,0);hctx.setTransform(d,0,0,d,0,0)}
-addEventListener('resize',resizeCanvas);resizeCanvas();
-const particles=Array.from({length:90},(_,i)=>({x:Math.random(),y:Math.random(),r:Math.random()*2+.4,s:Math.random()*.0007+.0002,p:Math.random()*Math.PI*2}));
-function drawGraphics(t=0){
- if(!vctx||!hctx)return;
- const w=innerWidth,h=innerHeight;vctx.clearRect(0,0,w,h);
- particles.forEach(p=>{p.y=(p.y-p.s+1)%1;const x=p.x*w,y=p.y*h;vctx.beginPath();vctx.arc(x,y,p.r,0,Math.PI*2);vctx.fillStyle=i%3===0?'rgba(0,229,255,.65)':i%3===1?'rgba(255,43,214,.65)':'rgba(124,60,255,.65)';vctx.fill()});
- const cw=heroCanvas.clientWidth,ch=heroCanvas.clientHeight;hctx.clearRect(0,0,cw,ch);
- const cx=cw*.58,cy=ch*.45;
- for(let ring=0;ring<5;ring++){hctx.beginPath();for(let a=0;a<=Math.PI*2+.05;a+=.08){const rr=65+ring*25+Math.sin(a*5+t*.001+ring)*7;const x=cx+Math.cos(a)*rr,y=cy+Math.sin(a)*rr*.72;if(a===0)hctx.moveTo(x,y);else hctx.lineTo(x,y)}hctx.strokeStyle=['rgba(0,229,255,','rgba(124,60,255,','rgba(255,43,214,'][ring%3]+(0.10+ring*.018)+')';hctx.lineWidth=1.5;hctx.stroke()}
- requestAnimationFrame(drawGraphics)
-}
-drawGraphics();
