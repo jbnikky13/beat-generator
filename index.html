@@ -1,44 +1,88 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#090a0c"><meta name="description" content="Song Studio — turn your lyrics into an original browser-generated song.">
-<title>Song Studio</title><link rel="stylesheet" href="./styles.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#08090f">
+<meta name="description" content="Song Studio — create AI songs and music videos from your lyrics.">
+<title>Song Studio — AI Music Creator</title>
+<link rel="stylesheet" href="./styles.css">
 </head>
-<body><main>
-<header class="topbar"><div class="brand"><span>SONG</span> STUDIO</div><div class="status"><span class="status-dot"></span> AI music generation · Lyria</div></header>
-<section class="hero"><div class="hero-art"><div class="aurora aurora-a"></div><div class="aurora aurora-b"></div><div class="music-card"><div class="album-glow"></div><div class="vinyl"><div class="vinyl-center">♫</div></div><div class="equalizer" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div></div><div><div class="eyebrow">AI-STYLE SONG CREATOR</div><h1>Turn your lyrics into a song.</h1><p>Upload or paste your lyrics, choose a sound, and generate a complete AI song with vocals, instrumentation and arrangement.</p></div></section>
-<div class="layout">
-<section class="card creator">
-<div class="section-title"><span>01</span> YOUR LYRICS</div>
-<div class="upload-row"><label class="upload"><input id="lyricsFile" type="file" accept=".txt,.md,text/plain">Upload lyrics</label><span id="fileName">or write them below</span></div>
-<textarea id="lyrics" spellcheck="true" placeholder="Paste your lyrics here…
+<body>
+<div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
+<main class="app-shell">
+<header class="topbar">
+  <a class="brand" href="./"><span class="brand-mark">S</span><span>SONG<span class="brand-light">STUDIO</span></span></a>
+  <div class="top-actions"><span class="live-dot"></span><span>AI MUSIC LAB</span></div>
+</header>
 
-Verse 1
+<section class="hero">
+  <div class="hero-copy">
+    <div class="eyebrow"><span></span> CREATE WITHOUT A STUDIO</div>
+    <h1>Turn words into<br><em>something you can hear.</em></h1>
+    <p>Write your lyrics. Pick a sound. Song Studio creates a complete track with vocals, instrumentation and arrangement.</p>
+    <div class="hero-stats"><div><strong>AI</strong><span>VOCALS</span></div><div><strong>∞</strong><span>IDEAS</span></div><div><strong>MP3</strong><span>EXPORT</span></div></div>
+  </div>
+  <div class="hero-visual">
+    <div class="visual-label">NOW CREATING <b>●</b></div>
+    <div class="cover-art"><div class="cover-orbit"></div><div class="cover-disc"><span>♫</span></div><div class="cover-title">SONG<br><b>STUDIO</b></div></div>
+    <div class="visual-footer"><span>YOUR NEXT HIT</span><div class="mini-bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+  </div>
+</section>
+
+<section class="workspace">
+  <div class="step-line"><span class="active">01</span><i></i><span>02</span><i></i><span>03</span></div>
+
+  <section class="panel lyrics-panel">
+    <div class="panel-head"><div><small>01</small><h2>Your lyrics</h2></div><span class="hint">Paste or upload</span></div>
+    <label class="dropzone" for="lyricsFile">
+      <div class="upload-icon">↑</div><div><strong>Upload lyrics</strong><span id="fileName">TXT or Markdown · or write below</span></div><button type="button">Choose file</button>
+      <input id="lyricsFile" type="file" accept=".txt,.md,text/plain">
+    </label>
+    <textarea id="lyrics" spellcheck="true" placeholder="Start writing your song…
+
+[Verse]
 I’m looking for a light tonight
 Something that can carry me
 
-Chorus
+[Chorus]
 We keep moving, we keep rising
 Till the morning finds us…"></textarea>
-<div class="lyrics-meta"><span id="wordCount">0 words</span><span>Sent securely only when you generate</span></div>
+    <div class="field-foot"><span id="wordCount">0 words</span><span>🔒 Sent securely when you generate</span></div>
+  </section>
+
+  <aside class="panel sound-panel">
+    <div class="panel-head"><div><small>02</small><h2>Choose your sound</h2></div><span class="hint">Style</span></div>
+    <div class="genre-grid" id="genres"></div>
+    <div class="tempo-box"><div><span>Tempo</span><strong id="bpmValue">110 BPM</strong></div><input id="bpm" type="range" min="70" max="170" value="110"></div>
+    <button id="generate" class="generate-btn"><span>✦</span> Generate AI Song <b>→</b></button>
+    <p class="provider">Powered by <strong>MiniMax Music 2.6</strong></p>
+  </aside>
 </section>
-<aside class="card settings">
-<div class="section-title"><span>02</span> CHOOSE YOUR SOUND</div>
-<div class="genre-grid" id="genres"></div>
-<label class="setting"><span>Tempo <b id="bpmValue">Auto</b></span><input id="bpm" type="range" min="70" max="170" value="110"></label>
-</aside>
-</div>
-<section class="card mode-card"><div class="mode-tabs"><button class="mode on" data-mode="song">SONG GENERATOR</button><button class="mode" data-mode="video">MUSIC VIDEO</button></div><div id="videoOptions" class="video-options hidden"><div class="section-title"><span>V</span> MUSIC VIDEO SOURCE</div><p class="video-note">Use your generated song or upload an audio file you own or are licensed to use.</p><div class="video-source"><label class="upload"><input id="audioFile" type="file" accept="audio/*">Upload audio</label><span id="audioName">or use your generated song</span></div><div class="spotify-row"><input id="spotifyUrl" class="video-prompt" placeholder="Spotify link (reference only)"><span class="spotify-note">Spotify audio cannot be downloaded or extracted here.</span></div><input id="videoPrompt" class="video-prompt" placeholder="Describe the visuals — e.g. Lagos at night, neon streets, cinematic artist performance"><button id="generateVideo" class="secondary">Generate MiniMax Video</button><div id="videoStage" class="video-stage"></div><div class="video-actions"><button id="composeVideo" disabled>Make Music Video</button><a id="downloadVideo" class="download-link hidden" download="song-video.webm">Download Video</a></div></div></section>
-<section class="card generate-card">
-<div><div class="section-title"><span>03</span> GENERATE</div><h2 id="songTitle">Your song is waiting.</h2><p id="songMeta">Add lyrics and choose a genre.</p></div>
-<div class="actions"><button id="generate" class="primary">Generate AI Song</button><button id="play" disabled>Play</button><button id="download" disabled>Download Song</button></div>
-<div class="progress"><div id="progressBar"></div></div>
+
+<section class="panel output-panel">
+  <div class="output-top"><div><small>03</small><h2 id="songTitle">Your song is waiting.</h2><p id="songMeta">Add lyrics and choose a genre to begin.</p></div><span class="badge" id="status">READY</span></div>
+  <div class="progress"><div id="progressBar"></div></div>
+  <div class="actions"><button id="play" disabled>▶ Play</button><button id="download" disabled>↓ Download MP3</button></div>
+  <div class="arrangement" id="arrangement"></div>
+  <div class="lyrics-preview" id="lyricsPreview"></div>
 </section>
-<section class="card result" id="result">
-<div class="result-head"><div><div class="section-title"><span>04</span> GENERATED SONG</div><h2>Ready to listen</h2></div><span class="badge" id="status">READY</span></div>
-<div class="arrangement" id="arrangement"></div>
-<div class="lyrics-preview" id="lyricsPreview"></div>
+
+<section class="panel video-panel">
+  <div class="video-head"><div><span class="pill">BONUS</span><small>04</small><h2>Make a music video</h2><p>Turn your generated song or licensed audio into AI visuals.</p></div><button class="mode on" data-mode="video">Open video studio →</button></div>
+  <div id="videoOptions" class="video-options">
+    <div class="video-grid">
+      <label class="mini-upload"><input id="audioFile" type="file" accept="audio/*"><span>↑</span><strong>Upload audio</strong><small id="audioName">Use a song you own or have rights to</small></label>
+      <div><input id="spotifyUrl" class="text-input" placeholder="Spotify link (reference only)"><small>Spotify audio cannot be downloaded here.</small></div>
+      <input id="videoPrompt" class="text-input wide" placeholder="Describe the visuals — Lagos at night, neon streets, cinematic artist performance">
+    </div>
+    <div class="video-controls"><button id="generateVideo" class="secondary">Generate MiniMax Video</button><button id="composeVideo" disabled>Make Music Video</button><a id="downloadVideo" class="download-link hidden" download="song-video.webm">Download Video</a></div>
+    <div id="videoStage" class="video-stage"></div>
+  </div>
 </section>
-<footer>Your lyrics are sent securely to the configured music-generation provider only when you generate a song.</footer>
-</main><script src="./app.js" defer></script></body></html>
+
+<footer><strong>SONG STUDIO</strong><span>AI music creation for the next generation of artists.</span><span>Built for creators everywhere.</span></footer>
+</main>
+<script src="./app.js" defer></script>
+</body>
+</html>
