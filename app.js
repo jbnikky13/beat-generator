@@ -178,10 +178,6 @@ $('#generate').onclick=generate;
 $('#genres').innerHTML=Object.keys(G).map(k=>`<button data-g="${k}">${G[k].n}</button>`).join('');
 function mark(){document.querySelectorAll('#genres button').forEach(b=>b.classList.toggle('on',b.dataset.g==genre))}
 $('#genres').onclick=e=>{const k=e.target.dataset.g;if(!k)return;const was=!!ctx;genre=k;mark();was&&play()};
-$('#bpm').oninput=e=>{song.bpm=Number(e.target.value);$('#bpmValue').textContent=song.bpm;$('#songMeta').textContent=gstr();if(ctx)play()};
-$('#volume').oninput=e=>{masterVolume=Number(e.target.value)/100;$('#volumeValue').textContent=e.target.value+'%'};
-$('#randomize').onclick=generate;
-$('#clearGrid').onclick=()=>{song.kick=[];song.snare=[];song.hat=Array(16).fill(0);song.clap=[];renderGrid()};
-$('#gen')?.addEventListener('click',()=>generate());
-playB.onclick=()=>ctx?stop():play();expB.onclick=exportTrack;\nwindow.addEventListener('keydown',e=>{if(e.code==='Space'&&e.target.tagName!=='INPUT'){e.preventDefault();ctx?stop():play()}});
-mark();generate();
+$('#bpm').oninput=e=>{if(!song){$('#bpmValue').textContent=e.target.value+' BPM';return}song.bpm=Number(e.target.value);$('#bpmValue').textContent=song.bpm+' BPM';$('#songMeta').textContent=gstr()};
+ playB.onclick=()=>ctx?stop():play();expB.onclick=exportTrack;\nwindow.addEventListener('keydown',e=>{if(e.code==='Space'&&e.target.tagName!=='INPUT'){e.preventDefault();ctx?stop():play()}});
+mark();
