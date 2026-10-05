@@ -19,14 +19,14 @@ const G={
 const VOX={afrobeats:[2,5,9,13],amapiano:[1,5,7,11,15],trap:[4,12,15],drill:[3,9,13]};
 const SECS=[['Intro',4,'pad hat'],['Verse',8,'kick snare hat bass stab perc'],['Hook',8,'kick snare hat bass stab pad lead perc'],['Verse',8,'kick snare hat bass stab perc'],['Hook',8,'kick snare hat bass stab pad lead perc'],['Outro',4,'pad kick hat']];
 const chordNotes=d=>[0,2,4].map(k=>{const i=d+k;return M[i%7]+12*Math.floor(i/7)});
-function gen(genre,seed){
+function gen(genre,seed,lyrics=''){
  const r=mulberry(seed),g=G[genre],bpm=Math.round(g.bpm[0]+r()*(g.bpm[1]-g.bpm[0])),root=Math.floor(r()*12);
  const kick=g.kick(r),sc=[0,3,5,7,10,12,15],mel=[];let idx=3;
  for(let b=0;b<4;b++)for(const s of g.mel)if(r()<.72){idx=Math.max(0,Math.min(6,idx+Math.floor(r()*5)-2));mel.push({b,s,n:sc[idx]})}
- const vox=[];for(let b=0;b<4;b++)for(const st of VOX[genre])if(r()<.6)vox.push({b,s:st,n:pick(r,[0,3,7,10,12]),v:pick(r,['a','o','e','u','i'])});
+ const words=lyrics.replace(/[^a-zA-Z0-9' -]/g,' ').split(/\s+/).filter(Boolean); const vox=[]; const slots=[2,5,9,13,15]; for(let i=0;i<Math.min(words.length,80);i++){const b=i%4,s=slots[i%slots.length],n=[0,3,5,7,10,12][Math.floor(r()*6)];vox.push({b,s,n,v:lyricVowel(words[i])})}
  const A=['Lagos','Midnight','Gold','Island','Velvet','Danfo','Sunset','Rain'],B=['Vibes','Wave','Skies','Motion','Fever','Drive','Season','Lights'];
  return{genre,seed,bpm,root,g,kick,mel,vox,prog:pick(r,g.prog),snare:g.snare,hat:g.hat(r),bass:g.bass?g.bass(r):kick,
-  title:pick(r,A)+' '+pick(r,B)}
+  title:pick(r,A)+' '+pick(r,B),lyrics,words}
 }
 function noise(ctx){const b=ctx.createBuffer(1,ctx.sampleRate,ctx.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;return b}
 function mk(ctx,out,nb,rv){
@@ -92,6 +92,9 @@ function schedule(ctx,X,S,t0){
      for(const m of S.vox)if(m.b==bar%4&&m.s==s)J.vox(t,67+S.root+m.n,m.v,sd*1.8,.22,dly)}}}}
  return bar*16*sd
 }
+function getLyrics(){return $('#lyrics').value.trim()}
+function lyricWords(){return getLyrics().replace(/\\s+/g,' ').split(' ').filter(Boolean)}
+function lyricVowel(word){const m=word.toLowerCase().match(/[aeiou]/);return m?m[0]:'a'}
 const wavBytes=buf=>{const n=buf.length,d=new DataView(new ArrayBuffer(44+n*4)),w=(o,t)=>[...t].forEach((c,i)=>d.setUint8(o+i,c.charCodeAt(0)));
  w(0,'RIFF');d.setUint32(4,36+n*4,true);w(8,'WAVEfmt ');d.setUint32(16,16,true);d.setUint16(20,1,true);d.setUint16(22,2,true);d.setUint32(24,buf.sampleRate,true);d.setUint32(28,buf.sampleRate*4,true);d.setUint16(32,4,true);d.setUint16(34,16,true);w(36,'data');d.setUint32(40,n*4,true);
  const L=buf.getChannelData(0),R=buf.getChannelData(1);for(let i=0;i<n;i++){d.setInt16(44+i*4,Math.max(-1,Math.min(1,L[i]))*32767,true);d.setInt16(46+i*4,Math.max(-1,Math.min(1,R[i]))*32767,true)}return new Uint8Array(d.buffer)};
@@ -103,7 +106,7 @@ function zipOne(name,data){const t=[];for(let n=0;n<256;n++){let c=n;for(let k=0
  E.setUint32(0,0x06054b50,true);E.setUint16(8,1,true);E.setUint16(10,1,true);E.setUint32(12,46+n,true);E.setUint32(16,30+n+z,true);
  return new Blob([h.buffer,nm,data,C.buffer,nm,E.buffer],{type:'application/zip'})}
 let genre='afrobeats',song,ctx=null,t0=0,raf=0,dur=0,masterVolume=.8;
-const bar=$('#bar'),playB=$('#play'),expB=$('#exp'),TOTAL=SECS.reduce((a,x)=>a+x[1],0);
+const bar=$('#arrangement'),playB=$('#play'),expB=$('#download'),TOTAL=SECS.reduce((a,x)=>a+x[1],0);
 function gstr(){return`${G[song.genre].n} · ${song.bpm} BPM · ${KEYS[song.root]} minor · seed ${song.seed}`}
 function currentSteps(track){
  if(track==='kick'||track==='snare') return song[track];
@@ -132,13 +135,14 @@ function renderGrid(){
  });
 }
 function generate(){
- stop();song=gen(genre,Math.random()*1e6|0);song.clap=[7,15];
- $('#title').textContent=song.title;$('#meta').textContent=gstr();
+ const lyrics=getLyrics(); if(!lyrics){$('#lyrics').focus();$('#songTitle').textContent='Add your lyrics first.';return}
+ stop();song=gen(genre,Math.random()*1e6|0,lyrics);song.clap=[7,15];
+ $('#songTitle').textContent=song.title;$('#songMeta').textContent=gstr()+' · '+song.words.length+' lyric words';
  $('#bpm').value=song.bpm;$('#bpmValue').textContent=song.bpm;
- renderGrid();
- bar.innerHTML=SECS.map(s=>'<div class="seg" style="flex:'+s[1]+'"><i></i><span>'+s[0]+'</span></div>').join('')
+ $('#play').disabled=false;$('#download').disabled=false;$('#status').textContent='READY';$('#status').className='badge ready';
+ $('#lyricsPreview').textContent=song.lyrics;$('#arrangement').innerHTML=SECS.map(s=>'<div><span>'+s[0]+'</span></div>').join('')
 }
-function stop(){cancelAnimationFrame(raf);if(ctx){ctx.close();ctx=null}playB.textContent='Play';bar.querySelectorAll('i').forEach(i=>i.style.width=0)}
+function stop(){cancelAnimationFrame(raf);if(ctx){ctx.close();ctx=null}playB.textContent='Play';playB.disabled=!song;bar.querySelectorAll('i').forEach(i=>i.style.width=0);if($('#status'))$('#status').textContent='READY'}
 function play(){stop();ctx=new(window.AudioContext||window.webkitAudioContext)();t0=ctx.currentTime+.15;dur=schedule(ctx,master(ctx),song,t0);playB.textContent='Stop';tick()}
 function tick(){
  if(!ctx)return;const el=ctx.currentTime-t0,bf=el/(16*60/song.bpm/4);let c=0;
@@ -159,7 +163,7 @@ async function exportTrack(){
   a.href=url;a.download=nm+'.wav';a.style.display='none';
   document.body.appendChild(a);a.click();a.remove();
   setTimeout(()=>URL.revokeObjectURL(url),1000);
-  expB.textContent='Downloaded';
+  expB.textContent='Downloaded';$('#status').textContent='DOWNLOADED';
  }catch(e){
   console.error(e);
   expB.textContent='Export failed';
@@ -167,13 +171,17 @@ async function exportTrack(){
  expB.disabled=false;
  setTimeout(()=>expB.textContent='Download WAV',2500);
 }
+$('#wordCount').textContent='0 words';
+$('#lyrics').oninput=()=>{$('#wordCount').textContent=lyricWords().length+' words'};
+$('#lyricsFile').onchange=e=>{const f=e.target.files[0];if(!f)return;$('#fileName').textContent=f.name;const rd=new FileReader();rd.onload=()=>{$('#lyrics').value=rd.result;$('#wordCount').textContent=lyricWords().length+' words'};rd.readAsText(f)};
+$('#generate').onclick=generate;
 $('#genres').innerHTML=Object.keys(G).map(k=>`<button data-g="${k}">${G[k].n}</button>`).join('');
 function mark(){document.querySelectorAll('#genres button').forEach(b=>b.classList.toggle('on',b.dataset.g==genre))}
-$('#genres').onclick=e=>{const k=e.target.dataset.g;if(!k)return;const was=!!ctx;genre=k;mark();generate();was&&play()};
-$('#bpm').oninput=e=>{song.bpm=Number(e.target.value);$('#bpmValue').textContent=song.bpm;$('#meta').textContent=gstr();if(ctx)play()};
+$('#genres').onclick=e=>{const k=e.target.dataset.g;if(!k)return;const was=!!ctx;genre=k;mark();was&&play()};
+$('#bpm').oninput=e=>{song.bpm=Number(e.target.value);$('#bpmValue').textContent=song.bpm;$('#songMeta').textContent=gstr();if(ctx)play()};
 $('#volume').oninput=e=>{masterVolume=Number(e.target.value)/100;$('#volumeValue').textContent=e.target.value+'%'};
 $('#randomize').onclick=generate;
 $('#clearGrid').onclick=()=>{song.kick=[];song.snare=[];song.hat=Array(16).fill(0);song.clap=[];renderGrid()};
-$('#gen').onclick=()=>{const was=!!ctx;generate();was&&play()};
+$('#gen')?.addEventListener('click',()=>generate());
 playB.onclick=()=>ctx?stop():play();expB.onclick=exportTrack;\nwindow.addEventListener('keydown',e=>{if(e.code==='Space'&&e.target.tagName!=='INPUT'){e.preventDefault();ctx?stop():play()}});
 mark();generate();
