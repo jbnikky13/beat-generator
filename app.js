@@ -80,7 +80,7 @@ function schedule(ctx,X,S,t0){
     if(L.has('snare')){if(S.snare.includes(s)){g.sn=='clap'?(I.clap(t,.6),I.snare(t,.25)):I.snare(t,.7)}
      if(last&&s>=12&&!S.snare.includes(s))I.snare(t,.25+(s-12)*.12)}
     if(L.has('hat')&&S.hat[s]>0)I.hat(t,S.hat[s],s==14&&b%2==1);
-    if(L.has('perc')&&g.perc[s]>0)I.hat(t+.004,g.perc[s]*.8);
+    if(L.has('perc')&&g.perc[s]>0)I.hat(t+.004,g.perc[s]*.8);\n    if(name!=='Intro'&&S.clap&&S.clap.includes(s))I.clap(t,.32);
     if(L.has('bass')&&bs.includes(s)){
      const nx=bs.find(x=>x>s),d=((nx===undefined?16:nx)-s)*sd,m=(s%3==2&&S.bt!='sub'?7:0)+rt;
      if(S.bt=='sub')J.sub(t,fr(24+S.root+rt),Math.min(d*.95,.9),.7);
@@ -102,16 +102,41 @@ function zipOne(name,data){const t=[];for(let n=0;n<256;n++){let c=n;for(let k=0
  C.setUint32(0,0x02014b50,true);C.setUint16(4,20,true);C.setUint16(6,20,true);C.setUint16(14,0x21,true);C.setUint32(16,c,true);C.setUint32(20,z,true);C.setUint32(24,z,true);C.setUint16(28,n,true);
  E.setUint32(0,0x06054b50,true);E.setUint16(8,1,true);E.setUint16(10,1,true);E.setUint32(12,46+n,true);E.setUint32(16,30+n+z,true);
  return new Blob([h.buffer,nm,data,C.buffer,nm,E.buffer],{type:'application/zip'})}
-let genre='afrobeats',song,ctx=null,t0=0,raf=0,dur=0;
+let genre='afrobeats',song,ctx=null,t0=0,raf=0,dur=0,masterVolume=.8;
 const bar=$('#bar'),playB=$('#play'),expB=$('#exp'),TOTAL=SECS.reduce((a,x)=>a+x[1],0);
 function gstr(){return`${G[song.genre].n} · ${song.bpm} BPM · ${KEYS[song.root]} minor · seed ${song.seed}`}
+function currentSteps(track){
+ if(track==='kick'||track==='snare') return song[track];
+ if(track==='hat') return song.hat.map((v,i)=>v>0?i:null).filter(v=>v!==null);
+ return song.clap||[];
+}
+function renderGrid(){
+ const pv=$('#preview'),nums=$('#stepNumbers');pv.innerHTML='';
+ nums.innerHTML='<span></span>'+Array.from({length:16},(_,i)=>'<span>'+(i+1)+'</span>').join('');
+ [['KICK','kick'],['SNARE','snare'],['HAT','hat'],['CLAP','clap']].forEach(([name,track])=>{
+  pv.insertAdjacentHTML('beforeend','<div class="label">'+name+'</div>');
+  const active=currentSteps(track);
+  for(let i=0;i<16;i++){
+   const cell=document.createElement('button');cell.type='button';cell.className='cell '+(active.includes(i)?'on':'');
+   cell.dataset.track=track;cell.dataset.step=i;
+   cell.onclick=()=>{
+    const steps=currentSteps(track),ix=steps.indexOf(i);
+    if(ix>=0)steps.splice(ix,1);else steps.push(i);
+    steps.sort((x,y)=>x-y);
+    if(track==='hat')song.hat=Array.from({length:16},(_,n)=>steps.includes(n)?.32:0);
+    else song[track]=steps;
+    cell.classList.toggle('on',ix<0);
+   };
+   pv.appendChild(cell);
+  }
+ });
+}
 function generate(){
- song=gen(genre,Math.random()*1e6|0);
+ stop();song=gen(genre,Math.random()*1e6|0);song.clap=[7,15];
  $('#title').textContent=song.title;$('#meta').textContent=gstr();
- const pv=$('#preview');pv.innerHTML='';
- const rows=[['KICK',song.kick],['SNARE',song.snare],['HAT',song.hat.map((v,i)=>v>0?i:null).filter(v=>v!==null)]];
- rows.forEach(([name,steps])=>{pv.insertAdjacentHTML('beforeend',`<div class="label">${name}</div>`);for(let i=0;i<16;i++)pv.insertAdjacentHTML('beforeend',`<div class="cell ${steps.includes(i)?'on':''}"></div>`)});
- bar.innerHTML=SECS.map(s=>`<div class="seg" style="flex:${s[1]}"><i></i><span>${s[0]}</span></div>`).join('')
+ $('#bpm').value=song.bpm;$('#bpmValue').textContent=song.bpm;
+ renderGrid();
+ bar.innerHTML=SECS.map(s=>'<div class="seg" style="flex:'+s[1]+'"><i></i><span>'+s[0]+'</span></div>').join('')
 }
 function stop(){cancelAnimationFrame(raf);if(ctx){ctx.close();ctx=null}playB.textContent='Play';bar.querySelectorAll('i').forEach(i=>i.style.width=0)}
 function play(){stop();ctx=new(window.AudioContext||window.webkitAudioContext)();t0=ctx.currentTime+.15;dur=schedule(ctx,master(ctx),song,t0);playB.textContent='Stop';tick()}
@@ -145,6 +170,10 @@ async function exportTrack(){
 $('#genres').innerHTML=Object.keys(G).map(k=>`<button data-g="${k}">${G[k].n}</button>`).join('');
 function mark(){document.querySelectorAll('#genres button').forEach(b=>b.classList.toggle('on',b.dataset.g==genre))}
 $('#genres').onclick=e=>{const k=e.target.dataset.g;if(!k)return;const was=!!ctx;genre=k;mark();generate();was&&play()};
+$('#bpm').oninput=e=>{song.bpm=Number(e.target.value);$('#bpmValue').textContent=song.bpm;$('#meta').textContent=gstr();if(ctx)play()};
+$('#volume').oninput=e=>{masterVolume=Number(e.target.value)/100;$('#volumeValue').textContent=e.target.value+'%'};
+$('#randomize').onclick=generate;
+$('#clearGrid').onclick=()=>{song.kick=[];song.snare=[];song.hat=Array(16).fill(0);song.clap=[];renderGrid()};
 $('#gen').onclick=()=>{const was=!!ctx;generate();was&&play()};
-playB.onclick=()=>ctx?stop():play();expB.onclick=exportTrack;
+playB.onclick=()=>ctx?stop():play();expB.onclick=exportTrack;\nwindow.addEventListener('keydown',e=>{if(e.code==='Space'&&e.target.tagName!=='INPUT'){e.preventDefault();ctx?stop():play()}});
 mark();generate();
