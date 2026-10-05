@@ -6,8 +6,8 @@
 <title>Song Studio</title><link rel="stylesheet" href="./styles.css">
 </head>
 <body><main>
-<header class="topbar"><div class="brand"><span>SONG</span> STUDIO</div><div class="status"><span class="status-dot"></span> Lyrics → Song · Browser-native</div></header>
-<section class="hero"><div><div class="eyebrow">AI-STYLE SONG CREATOR</div><h1>Turn your lyrics into a song.</h1><p>Paste or upload lyrics, choose a genre, generate an original arrangement, then download the finished WAV.</p></div></section>
+<header class="topbar"><div class="brand"><span>SONG</span> STUDIO</div><div class="status"><span class="status-dot"></span> AI music generation · Lyria</div></header>
+<section class="hero"><div><div class="eyebrow">AI-STYLE SONG CREATOR</div><h1>Turn your lyrics into a song.</h1><p>Upload or paste your lyrics, choose a sound, and generate a complete AI song with vocals, instrumentation and arrangement.</p></div></section>
 <div class="layout">
 <section class="card creator">
 <div class="section-title"><span>01</span> YOUR LYRICS</div>
@@ -31,7 +31,7 @@ Till the morning finds us…"></textarea>
 </div>
 <section class="card generate-card">
 <div><div class="section-title"><span>03</span> GENERATE</div><h2 id="songTitle">Your song is waiting.</h2><p id="songMeta">Add lyrics and choose a genre.</p></div>
-<div class="actions"><button id="generate" class="primary">Generate Song</button><button id="play" disabled>Play</button><button id="download" disabled>Download WAV</button></div>
+<div class="actions"><button id="generate" class="primary">Generate AI Song</button><button id="play" disabled>Play</button><button id="download" disabled>Download Song</button></div>
 <div class="progress"><div id="progressBar"></div></div>
 </section>
 <section class="card result" id="result">
@@ -39,5 +39,5 @@ Till the morning finds us…"></textarea>
 <div class="arrangement" id="arrangement"></div>
 <div class="lyrics-preview" id="lyricsPreview"></div>
 </section>
-<footer>Song Studio uses Web Audio synthesis. No lyrics are uploaded to a server.</footer>
+<footer>Your lyrics are sent securely to the configured music-generation provider only when you generate a song.</footer>
 </main><script src="./app.js" defer></script></body></html>
