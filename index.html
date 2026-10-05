@@ -1,25 +1,11 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#090a0c">
-<meta name="description" content="Beat Studio — browser-native beat generation and WAV export.">
-<link rel="stylesheet" href="./styles.css">
-<title>Beat Studio</title>
-</head>
-<body>
-<main>
-<header class="topbar"><div class="brand"><span>BEAT</span> STUDIO</div><div class="status">Browser-native · no server required</div></header>
-<div class="studio">
-<aside class="panel" style="padding:14px;border-radius:16px"><div class="mut" style="margin-bottom:10px">GENRE</div><div class="genres" id="genres"></div></aside>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#090a0c"><meta name="description" content="Beat Studio — generate, edit, play and download browser-native beats."><link rel="stylesheet" href="./styles.css"><title>Beat Studio</title></head>
+<body><main>
+<header class="topbar"><div class="brand"><span>BEAT</span> STUDIO</div><div class="status"><span class="status-dot"></span> Browser-native · no server required</div></header>
+<div class="studio"><aside class="panel"><div class="panel-head"><div class="mut">GENRE</div><div class="genre-count">4 styles</div></div><div class="genres" id="genres"></div><div class="side-divider"></div><div class="mut">ENGINE</div><div class="engine-note">Web Audio synthesis<br>Offline WAV rendering</div></aside>
 <section class="workspace">
-<div class="card"><h2 id="title"></h2><p id="meta"></p><div class="section-strip" id="bar"></div>
-<div class="controls"><button id="play">Play</button><button id="gen">New track</button><button id="exp">Download WAV</button></div></div>
-<div class="card"><div class="mut">4-BAR RHYTHM PREVIEW</div><div class="sequencer" id="preview"></div></div>
-</section>
-</div>
-</main>
-<script src="./app.js" defer></script>
-</body>
-</html>
+<div class="card hero"><div class="hero-copy"><div class="eyebrow">GENERATIVE BEAT STUDIO</div><h1 id="title">Your next beat</h1><p id="meta"></p></div><div class="transport"><button id="play" class="primary">Play</button><button id="gen">New track</button><button id="exp">Download WAV</button></div><div class="mixer"><label class="range"><span>BPM <b id="bpmValue">120</b></span><input id="bpm" type="range" min="70" max="180" value="120"></label><label class="range"><span>MASTER <b id="volumeValue">80%</b></span><input id="volume" type="range" min="0" max="100" value="80"></label><button id="randomize" class="small-btn">↻ Randomize</button></div></div>
+<div class="card"><div class="card-top"><div><div class="mut">ARRANGEMENT</div><div class="hint">Intro → Verse → Hook → Verse → Hook → Outro</div></div><div class="live-badge" id="liveBadge">READY</div></div><div class="section-strip" id="bar"></div></div>
+<div class="card"><div class="card-top"><div><div class="mut">16-STEP DRUM GRID</div><div class="hint">Tap a step to edit the beat</div></div><button id="clearGrid" class="small-btn">Clear</button></div><div class="grid-wrap"><div class="step-numbers" id="stepNumbers"></div><div class="sequencer" id="preview"></div></div></div>
+<div class="card tip-card"><div class="tip-icon">♪</div><div><strong>Make it yours</strong><span>Generate a foundation, then edit individual drum hits before exporting your WAV.</span></div></div>
+</section></div></main><script src="./app.js" defer></script></body></html>
