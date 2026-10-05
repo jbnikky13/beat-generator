@@ -50,10 +50,10 @@ const particles=Array.from({length:90},(_,i)=>({x:Math.random(),y:Math.random(),
 function drawGraphics(t=0){
  if(!vctx||!hctx)return;
  const w=innerWidth,h=innerHeight;vctx.clearRect(0,0,w,h);
- particles.forEach(p=>{p.y=(p.y-p.s+1)%1;const x=p.x*w,y=p.y*h;vctx.beginPath();vctx.arc(x,y,p.r,0,Math.PI*2);vctx.fillStyle='rgba(255,130,85,.55)';vctx.fill()});
+ particles.forEach(p=>{p.y=(p.y-p.s+1)%1;const x=p.x*w,y=p.y*h;vctx.beginPath();vctx.arc(x,y,p.r,0,Math.PI*2);vctx.fillStyle=i%3===0?'rgba(0,229,255,.65)':i%3===1?'rgba(255,43,214,.65)':'rgba(124,60,255,.65)';vctx.fill()});
  const cw=heroCanvas.clientWidth,ch=heroCanvas.clientHeight;hctx.clearRect(0,0,cw,ch);
  const cx=cw*.58,cy=ch*.45;
- for(let ring=0;ring<5;ring++){hctx.beginPath();for(let a=0;a<=Math.PI*2+.05;a+=.08){const rr=65+ring*25+Math.sin(a*5+t*.001+ring)*7;const x=cx+Math.cos(a)*rr,y=cy+Math.sin(a)*rr*.72;if(a===0)hctx.moveTo(x,y);else hctx.lineTo(x,y)}hctx.strokeStyle='rgba(255,107,53,'+(0.08+ring*.018)+')';hctx.lineWidth=1.5;hctx.stroke()}
+ for(let ring=0;ring<5;ring++){hctx.beginPath();for(let a=0;a<=Math.PI*2+.05;a+=.08){const rr=65+ring*25+Math.sin(a*5+t*.001+ring)*7;const x=cx+Math.cos(a)*rr,y=cy+Math.sin(a)*rr*.72;if(a===0)hctx.moveTo(x,y);else hctx.lineTo(x,y)}hctx.strokeStyle=['rgba(0,229,255,','rgba(124,60,255,','rgba(255,43,214,'][ring%3]+(0.10+ring*.018)+')';hctx.lineWidth=1.5;hctx.stroke()}
  requestAnimationFrame(drawGraphics)
 }
 drawGraphics();
