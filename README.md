@@ -1,72 +1,30 @@
-# 🎵 Song Studio
+# Song Studio — AI Music Creator + Music Editor
 
-**Suno-powered AI Song Creator**
+Song Studio combines an AI song-generation workflow with a lightweight, browser-based editor for music files you have the right to use.
 
-Song Studio turns your lyrics into songs with **Suno**. Write or upload lyrics, choose a genre and tempo, generate, play, and download.
+## Music editor
+Open [Music Editor](./editor.html) to:
+- Import local audio files supported by the browser.
+- Preview the waveform and play the selected section.
+- Trim by start/end time.
+- Adjust output volume, fade-in and fade-out.
+- Optionally peak-normalize the rendered audio toward -1 dB.
+- Export the edited selection as a WAV file.
 
-## Features
-- Lyrics paste/upload
-- Afrobeats, Amapiano, Melodic Trap, Drill, R&B, Contemporary Gospel and Dancehall
-- BPM control
-- Suno Custom Mode generation
-- Browser playback
-- MP3 download
-- Optional music-video workspace
+Audio editing and WAV rendering run locally in the browser; the editor does not upload the imported audio to a server. Large or long audio files require sufficient device memory.
 
-## Architecture
-```
-Song Studio (Vercel)
-       ↓
-/api/generate
-       ↓
-Suno API (gcui-art/suno-api)
-       ↓
-Suno
-       ↓
-Audio URL
-       ↓
-Play / Download
-```
+## AI song creator
+The home page keeps the existing lyrics-to-song workflow:
+- Paste or upload lyrics.
+- Choose Afrobeats, Amapiano, Melodic Trap, Drill, R&B, Contemporary Gospel or Dancehall.
+- Set tempo and request a generated song.
+- Play and download the result.
+- Optional music-video workflow for audio you own or are licensed to use.
 
-The upstream project is an **unofficial** Suno integration. It documents Vercel deployment plus `/api/custom_generate`, `/api/get`, and `/api/get_limit`. citeturn0view0turn1view0
+AI generation requires the repository's server-side API configuration. Do not expose provider API keys in client-side code.
 
-## Vercel configuration
-
-Deploy the upstream Suno API separately and add:
-
-```env
-SUNO_API_URL=https://your-suno-api.vercel.app
-```
-
-The upstream service requires its own private Suno configuration. Its current documentation lists `SUNO_COOKIE` and, for its CAPTCHA flow, `TWOCAPTCHA_KEY`. citeturn0view0
-
-**Never put your Suno cookie in GitHub, `index.html`, or client-side JavaScript.**
-
-## Setup
-
-1. Deploy `gcui-art/suno-api` to Vercel.
-2. Configure its required private environment variables.
-3. Verify `/api/get_limit`.
-4. Add `SUNO_API_URL` to this Song Studio project.
-5. Redeploy Song Studio.
-6. Generate a song.
-
-The upstream project says its demo is bound to a test/free Suno account and has daily limits. citeturn0view0
+## Run locally
+Open `index.html` through a local static server for the best browser compatibility. The editor itself uses the Web Audio API and requires a modern browser.
 
 ## Important
-
-The upstream project states that it is unofficial and intended for learning/research purposes. citeturn0view0 Use Suno according to the terms and rights applicable to your account.
-
-## Structure
-```
-beat-generator/
-├── api/
-│   ├── generate.js
-│   └── video.js
-├── index.html
-├── app.js
-├── styles.css
-└── README.md
-```
-
-**Song Studio — write it. Suno sings it. 🎵**
+Import only audio you own or have permission to edit. Export format is currently 16-bit PCM WAV. MP3 export and advanced multi-track arrangement are not implemented yet.
