@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#08090f">
+<meta name="description" content="Edit your own music in your browser. Trim, fade, adjust volume, preview and export audio.">
+<title>Song Studio — Music Editor</title><link rel="stylesheet" href="./editor.css">
+</head>
+<body>
+<main class="shell">
+<header class="top"><a class="brand" href="./"><span class="mark">S</span> SONG<span>STUDIO</span></a><nav><a href="./">AI Song Creator</a><span class="active">Music Editor</span></nav></header>
+<section class="intro"><div class="eyebrow">YOUR SOUND. YOUR CONTROL.</div><h1>Make the track <em>feel right.</em></h1><p>Bring in a song you own or have permission to edit. Shape the start and ending, adjust levels, preview changes, then export your edit.</p></section>
+<section class="workspace">
+<div class="toolbar"><div class="file-info"><div class="file-icon">♫</div><div><strong id="trackName">No track loaded</strong><small id="trackMeta">Upload an audio file to start editing</small></div></div><label class="upload button" for="audioInput">↑ Import audio<input id="audioInput" type="file" accept="audio/*"></label></div>
+<div class="wave-panel"><div class="wave-head"><span>WAVEFORM / SELECTION</span><span id="durationLabel">00:00 / 00:00</span></div><canvas id="waveform" aria-label="Audio waveform preview"></canvas><div class="time-row"><span id="startTime">00:00.0</span><span id="playTime">PLAYHEAD 00:00.0</span><span id="endTime">00:00.0</span></div><div class="transport"><button id="playBtn" disabled>▶ Play</button><button id="stopBtn" disabled>■ Stop</button><button id="resetBtn" disabled>Reset edit</button><div class="spacer"></div><span id="status">Waiting for audio</span></div></div>
+<div class="edit-grid">
+<section class="card"><div class="card-title"><span>01</span><h2>Trim selection</h2></div><p>Choose the section you want to keep. Drag the handles by changing the start and end times.</p>
+<div class="range-field"><label for="trimStart">Start <strong id="trimStartValue">0.0 s</strong></label><input id="trimStart" type="range" min="0" max="100" value="0" disabled></div>
+<div class="range-field"><label for="trimEnd">End <strong id="trimEndValue">0.0 s</strong></label><input id="trimEnd" type="range" min="0" max="100" value="100" disabled></div>
+<div class="pair"><label>Start (seconds)<input id="startNumber" type="number" min="0" step="0.1" value="0" disabled></label><label>End (seconds)<input id="endNumber" type="number" min="0" step="0.1" value="0" disabled></label></div>
+</section>
+<section class="card"><div class="card-title"><span>02</span><h2>Shape the sound</h2></div>
+<div class="range-field"><label for="volume">Output volume <strong id="volumeValue">100%</strong></label><input id="volume" type="range" min="0" max="150" value="100" disabled></div>
+<div class="range-field"><label for="fadeIn">Fade in <strong id="fadeInValue">0.0 s</strong></label><input id="fadeIn" type="range" min="0" max="10" step=".1" value="0" disabled></div>
+<div class="range-field"><label for="fadeOut">Fade out <strong id="fadeOutValue">0.0 s</strong></label><input id="fadeOut" type="range" min="0" max="10" step=".1" value="0" disabled></div>
+<div class="range-field"><label for="normalize">Peak normalize <strong id="normalizeValue">Off</strong></label><label class="switch"><input id="normalize" type="checkbox" disabled><span>Raise or lower peak toward -1 dB</span></label></div>
+</section>
+</div>
+<section class="export card"><div><div class="card-title"><span>03</span><h2>Export your edit</h2></div><p>Render your selected section with the edits applied. Export is processed locally in your browser.</p></div><div class="export-actions"><label for="format">Format<select id="format" disabled><option value="wav">WAV · highest compatibility</option></select></label><button id="exportBtn" class="primary" disabled>↓ Export edited WAV</button></div><div id="exportProgress" class="progress hidden"><span id="progressBar"></span></div></section>
+<p class="privacy">Audio stays on your device for editing. Import only music you own or are authorized to modify.</p>
+<footer><a href="./">← Back to Song Studio</a><span>Built for creators everywhere.</span></footer>
+</section>
+</main><script src="./editor.js" defer></script>
+</body></html>
